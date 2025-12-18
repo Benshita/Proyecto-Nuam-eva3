@@ -1,0 +1,36 @@
+# Django Framework
+django
+
+# Web Server
+gunicorn
+
+# Environment Variables
+python-dotenv
+
+# Database
+psycopg2-binary
+# Static Files Management
+whitenoise
+
+# Excel File Handling
+openpyxl
+
+# MFA - Multi-Factor Authentication
+pyotp
+qrcode
+Pillow
+
+# Testing (opcional, para desarrollo)
+pytest
+pytest-django
+
+# Code Quality (opcional, para desarrollo)
+black
+flake8
+isort
+
+# Security
+django-cors-headers
+
+# API y Utilities
+requests

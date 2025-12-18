@@ -1,0 +1,396 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Carga de calificaciones</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #fff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title i {
+            margin-right: 1rem;
+            color: #fbbf24;
+        }
+
+        .modal {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .modal-header i {
+            font-size: 1.5rem;
+            color: #fbbf24;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .tab-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 0.75rem 1rem;
+            display: inline-block;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .tab-header i {
+            margin-right: 0.5rem;
+            color: #fbbf24;
+        }
+
+        .table-wrapper {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            max-height: 350px;
+            overflow: auto;
+            font-size: 0.85rem;
+            background: #f9fafb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        tbody tr:hover {
+            background-color: #f0f4ff;
+            transition: background-color 0.2s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+            font-size: 1rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 2px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            align-items: center;
+            background: #f9fafb;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border-radius: 6px;
+            border: none;
+            padding: 0.6rem 1.6rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+        }
+
+        .btn-primary:disabled {
+            background: #c0c0c0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .btn-outline {
+            background: #fff;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: #fff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            border-radius: 6px;
+            border: 2px solid #667eea;
+            padding: 0.6rem 1.4rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: #fff;
+            color: #667eea;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .file-label:hover {
+            background: #667eea;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .file-name {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-left: 1rem;
+            font-weight: 500;
+        }
+
+        .messages {
+            margin: 2rem auto;
+            max-width: 1100px;
+        }
+
+        .messages ul {
+            list-style: none;
+        }
+
+        .messages li {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<h1 class="page-title"><i class="fas fa-file-upload"></i>Carga de calificaciones</h1>
+
+<form method="post" enctype="multipart/form-data" id="carga-form">
+    {% csrf_token %}
+
+    <div class="modal">
+        <div class="modal-header">
+            <i class="fas fa-upload"></i>Cargar Archivo
+        </div>
+
+        <div class="modal-body">
+            <div class="tab-header"><i class="fas fa-table"></i>Vista previa</div>
+
+            <div class="table-wrapper">
+                <table id="preview-table">
+                    <thead>
+                        <!-- Se llena dinámicamente con el encabezado del archivo -->
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="no-data">No hay registros.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <!-- Campo de archivo de tu formulario -->
+            <!-- AJUSTA "archivo" AL NOMBRE REAL DEL CAMPO EN TU FORM -->
+            <label class="file-label">
+                <i class="fas fa-folder-open"></i>Seleccionar Archivo
+                {{ form.archivo }}
+            </label>
+            <span id="file-name" class="file-name">Ningún archivo seleccionado</span>
+
+            <button type="submit" class="btn btn-primary" id="btn-agregar" disabled>
+                <i class="fas fa-save"></i>AGREGAR
+            </button>
+
+            <a href="{% url 'dashboard:dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>CANCELAR
+            </a>
+
+            <a href="{% static 'formatos/formato.xlsx' %}" 
+            class="btn btn-outline"
+            download>
+                <i class="fas fa-download"></i>VER FORMATO
+            </a>
+        </div>
+    </div>
+</form>
+
+{% if messages %}
+    <div class="messages">
+        <ul>
+            {% for message in messages %}
+                <li><i class="fas fa-check-circle"></i> {{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<script>
+    // ajusta si tu input file tiene otro id
+    const fileInput  = document.querySelector('input[type="file"]');
+    const fileNameEl = document.getElementById('file-name');
+    const btnAgregar  = document.getElementById('btn-agregar');
+    const table      = document.getElementById('preview-table');
+    const thead      = table.querySelector('thead');
+    const tbody      = table.querySelector('tbody');
+
+    fileInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) {
+            fileNameEl.textContent = 'Ningún archivo seleccionado';
+            btnAgregar.disabled = true;
+            return;
+        }
+
+        fileNameEl.textContent = file.name;
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            // Leemos como binario/array para XLSX
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+
+            // Tomamos la primera hoja
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+
+            // Obtenemos los datos como matriz de filas
+            // header:1 -> primera fila = encabezados
+            // defval:"" -> celdas vacías como string vacío
+            let rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+
+            // Opcional: limitar filas mostradas (ej. primeras 500)
+            const MAX_ROWS = 500;
+            if (rows.length > MAX_ROWS + 1) {
+                rows = rows.slice(0, MAX_ROWS + 1);
+            }
+
+            // Limpiamos tabla
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td class="no-data">No hay registros.</td></tr>';
+                btnAgregar.disabled = true;
+                return;
+            }
+
+            // Primera fila = encabezados
+            const headers = rows[0];
+            const headerTr = document.createElement('tr');
+            headers.forEach(h => {
+                const th = document.createElement('th');
+                th.textContent = (h || '').toString().trim();
+                headerTr.appendChild(th);
+            });
+            thead.appendChild(headerTr);
+
+            // Resto de filas = datos
+            const dataRows = rows.slice(1);
+            if (dataRows.length === 0) {
+                tbody.innerHTML = '<tr><td class="no-data">No hay registros.</td></tr>';
+                btnAgregar.disabled = true;
+                return;
+            }
+
+            dataRows.forEach(row => {
+                const tr = document.createElement('tr');
+                row.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.textContent = (cell || '').toString();
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+
+            // Habilitar AGREGAR solo si hay datos
+            btnAgregar.disabled = dataRows.length === 0;
+        };
+
+        // IMPORTANTE: para xlsx usamos readAsArrayBuffer
+        reader.readAsArrayBuffer(file);
+    });
+</script>
+
+</body>
+</html>

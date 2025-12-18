@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscar calificaciones</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+          background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          min-height: 100vh;
+          padding: 2rem 1rem;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #fff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title i {
+            margin-right: 1rem;
+            color: #fbbf24;
+        }
+
+        .container {
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+
+        h2 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          margin-bottom: 1.5rem;
+          color: #fff;
+        }
+
+        h3 {
+          font-size: 1.2rem;
+          font-weight: 600;
+          margin: 1.5rem 0 1rem;
+          color: #1f2937;
+        }
+
+        .card {
+          background-color: #ffffff;
+          padding: 1.5rem;
+          border-radius: 12px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          margin-bottom: 1.5rem;
+        }
+
+        .search-form {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          align-items: flex-end;
+        }
+
+        .field-group {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          min-width: 200px;
+        }
+
+        .field-label {
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #374151;
+          margin-bottom: 0.4rem;
+        }
+
+        input,
+        select {
+          padding: 0.6rem 0.8rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 8px;
+          font-size: 0.9rem;
+          color: #374151;
+          transition: all 0.3s ease-in-out;
+        }
+
+        input:focus,
+        select:focus {
+          outline: none;
+          border-color: #0d9488;
+          box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+
+        .search-actions {
+          display: flex;
+          gap: 0.75rem;
+        }
+
+        .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.6rem 1.5rem;
+          font-size: 0.9rem;
+          font-weight: 600;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          text-decoration: none;
+          transition: all 0.3s ease-in-out;
+          gap: 0.5rem;
+        }
+
+        .btn-primary {
+          background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+          color: #ffffff;
+        }
+
+        .btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px rgba(13, 148, 136, 0.3);
+        }
+
+        .btn-secondary {
+          background-color: #e5e7eb;
+          color: #374151;
+        }
+
+        .btn-secondary:hover {
+          background-color: #d1d5db;
+        }
+
+        .btn-danger {
+          background-color: #ef4444;
+          color: #ffffff;
+        }
+
+        .btn-danger:hover {
+          background-color: #dc2626;
+          transform: translateY(-2px);
+        }
+
+        .table-container {
+          overflow-x: auto;
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 0.85rem;
+        }
+
+        thead {
+          background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+          color: white;
+        }
+
+        th, td {
+          padding: 0.75rem 1rem;
+          border-bottom: 1px solid #e5e7eb;
+          text-align: left;
+        }
+
+        th {
+          font-weight: 600;
+        }
+
+        tbody tr:hover {
+          background-color: #f0f4ff;
+        }
+
+        .cell-actions {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+
+        .empty-row {
+          text-align: center;
+          padding: 2rem;
+          color: #9ca3af;
+        }
+
+        .footer-actions {
+          margin-top: 1.5rem;
+          display: flex;
+          justify-content: flex-end;
+          gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+<h1 class="page-title"><i class="fas fa-search"></i>Buscar Calificaciones</h1>
+
+<div class="container">
+    <!-- FORMULARIO DE BÚSQUEDA -->
+    <div class="card">
+        <h3><i class="fas fa-filter mr-2" style="color: #667eea;"></i>Filtros de búsqueda</h3>
+        <form method="get" class="search-form">
+            <div class="field-group">
+                <label for="ejercicio" class="field-label"><i class="fas fa-calendar mr-1" style="color: #667eea;"></i>Ejercicio</label>
+                <input type="number" id="ejercicio" name="ejercicio"
+                       min="1000" max="9999"
+                       value="{{ request.GET.ejercicio }}">
+            </div>
+
+            <div class="field-group">
+                <label for="mercado" class="field-label"><i class="fas fa-chart-line mr-1" style="color: #667eea;"></i>Mercado</label>
+                <input type="text" id="mercado" name="mercado"
+                       value="{{ request.GET.mercado }}">
+            </div>
+
+            <div class="field-group">
+                <label for="fecha" class="field-label"><i class="fas fa-clock mr-1" style="color: #667eea;"></i>Fecha</label>
+                <input type="date" id="fecha" name="fecha"
+                       value="{{ request.GET.fecha }}">
+            </div>
+
+            <div class="search-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>Buscar
+                </button>
+                <a href="{% url 'dashboard:buscar_calificaciones' %}" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i>Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="card">
+        <h3><i class="fas fa-list mr-2" style="color: #667eea;"></i>Resultados de búsqueda</h3>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-cog"></i> Acciones</th>
+                        <th>ID</th>
+                        <th>Ejercicio</th>
+                        <th>Mercado</th>
+                        <th>Instrumento</th>
+                        <th>Fecha</th>
+                        <th>Valor histórico</th>
+                        <th>Factor 8</th>
+                        <th>Factor 9</th>
+                        <th>Factor 10</th>
+                        <th>Factor 11</th>
+                        <th>Factor 12</th>
+                        <th>Factor 13</th>
+                        <th>Factor 14</th>
+                        <th>Factor 15</th>
+                        <th>Factor 16</th>
+                        <th>Factor 17</th>
+                        <th>Factor 18</th>
+                        <th>Factor 19</th>
+                        <th>Factor 20</th>
+                        <th>Factor 21</th>
+                        <th>Factor 22</th>
+                        <th>Factor 23</th>
+                        <th>Factor 24</th>
+                        <th>Factor 25</th>
+                        <th>Factor 26</th>
+                        <th>Factor 27</th>
+                        <th>Factor 28</th>
+                        <th>Factor 29</th>
+                        <th>Factor 30</th>
+                        <th>Factor 31</th>
+                        <th>Factor 32</th>
+                        <th>Factor 33</th>
+                        <th>Factor 34</th>
+                        <th>Factor 35</th>
+                        <th>Factor 36</th>
+                        <th>Factor 37</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for calificacion in calificaciones %}
+                        <tr>
+                            <td>
+                                <div class="cell-actions">
+                                    <a href="{% url 'dashboard:modificar_calificacion' calificacion.pk %}"
+                                       class="btn btn-primary" style="padding:0.3rem 0.6rem;font-size:0.8rem;">
+                                        <i class="fas fa-edit"></i>Editar
+                                    </a>
+                                    <a href="{% url 'dashboard:eliminar_calificacion' calificacion.pk %}"
+                                       class="btn btn-danger" style="padding:0.3rem 0.6rem;font-size:0.8rem;">
+                                        <i class="fas fa-trash"></i>Eliminar
+                                    </a>
+                                </div>
+                            </td>
+                            <td>{{ calificacion.id }}</td>
+                            <td>{{ calificacion.ejercicio }}</td>
+                            <td>{{ calificacion.mercado }}</td>
+                            <td>{{ calificacion.instrumento }}</td>
+                            <td>{{ calificacion.fecha }}</td>
+                            <td>{{ calificacion.valor_historico }}</td>
+                            <td>{{ calificacion.factor_8 }}</td>
+                            <td>{{ calificacion.factor_9 }}</td>
+                            <td>{{ calificacion.factor_10 }}</td>
+                            <td>{{ calificacion.factor_11 }}</td>
+                            <td>{{ calificacion.factor_12 }}</td>
+                            <td>{{ calificacion.factor_13 }}</td>
+                            <td>{{ calificacion.factor_14 }}</td>
+                            <td>{{ calificacion.factor_15 }}</td>
+                            <td>{{ calificacion.factor_16 }}</td>
+                            <td>{{ calificacion.factor_17 }}</td>
+                            <td>{{ calificacion.factor_18 }}</td>
+                            <td>{{ calificacion.factor_19 }}</td>
+                            <td>{{ calificacion.factor_20 }}</td>
+                            <td>{{ calificacion.factor_21 }}</td>
+                            <td>{{ calificacion.factor_22 }}</td>
+                            <td>{{ calificacion.factor_23 }}</td>
+                            <td>{{ calificacion.factor_24 }}</td>
+                            <td>{{ calificacion.factor_25 }}</td>
+                            <td>{{ calificacion.factor_26 }}</td>
+                            <td>{{ calificacion.factor_27 }}</td>
+                            <td>{{ calificacion.factor_28 }}</td>
+                            <td>{{ calificacion.factor_29 }}</td>
+                            <td>{{ calificacion.factor_30 }}</td>
+                            <td>{{ calificacion.factor_31 }}</td>
+                            <td>{{ calificacion.factor_32 }}</td>
+                            <td>{{ calificacion.factor_33 }}</td>
+                            <td>{{ calificacion.factor_34 }}</td>
+                            <td>{{ calificacion.factor_35 }}</td>
+                            <td>{{ calificacion.factor_36 }}</td>
+                            <td>{{ calificacion.factor_37 }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="38" class="empty-row">
+                                <i class="fas fa-inbox mr-2" style="font-size: 2rem;"></i>
+                                <p>No se encontraron calificaciones.</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-actions">
+            <a href="{% url 'dashboard:dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>Volver
+            </a>
+            <a href="{% url 'dashboard:agregar_calificacion' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>Nueva calificación
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

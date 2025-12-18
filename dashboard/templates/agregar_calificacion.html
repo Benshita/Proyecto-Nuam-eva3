@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva calificación</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+          background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          min-height: 100vh;
+          padding: 2rem 1rem;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #fff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title i {
+            margin-right: 1rem;
+            color: #fbbf24;
+        }
+
+        .container {
+          max-width: 1300px;
+          margin: 0 auto;
+        }
+
+        .card {
+          background-color: #ffffff;
+          padding: 2rem;
+          border-radius: 12px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          margin-bottom: 1.5rem;
+          color: #1f2937;
+        }
+
+        h3 {
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin: 1.5rem 0 1rem;
+          color: #374151;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        h3 i {
+            color: #667eea;
+        }
+
+        .grid-3 {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          column-gap: 1.5rem;
+          row-gap: 1rem;
+        }
+
+        .field-wrapper {
+            display: grid;
+            grid-template-columns: 170px minmax(0, 1fr);
+            column-gap: 0.5rem;
+            row-gap: 0.15rem;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .label {
+            font-weight: 600;
+            color: #374151;
+            text-align: right;
+            padding-right: 0.4rem;
+        }
+
+        .error {
+          grid-column: 1 / span 2;
+          font-size: 0.85rem;
+          color: #dc2626;
+          padding: 0.5rem;
+          background: #fee2e2;
+          border-radius: 4px;
+        }
+
+        input,
+        textarea,
+        select {
+          width: 100%;
+          padding: 0.6rem 0.8rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 8px;
+          box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+          color: #374151;
+          font-size: 0.9rem;
+          transition: all 0.3s ease-in-out;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+          outline: none;
+          border-color: #6366f1;
+          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        textarea {
+          resize: vertical;
+          min-height: 100px;
+        }
+
+        .actions {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 1.5rem;
+          padding-top: 2rem;
+          margin-top: 2rem;
+          border-top: 2px solid #e5e7eb;
+        }
+
+        .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.75rem 2rem;
+          font-size: 0.9rem;
+          font-weight: 600;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          text-decoration: none;
+          transition: all 0.3s ease-in-out;
+          gap: 0.5rem;
+        }
+
+        .btn-secondary {
+          border: 2px solid #e5e7eb;
+          color: #374151;
+          background-color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+          background-color: #f9fafb;
+          transform: translateY(-2px);
+        }
+
+        .btn-primary {
+          background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+          color: #ffffff;
+        }
+
+        .btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        @media (max-width: 1024px) {
+          .grid-3 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 768px) {
+          .grid-3 {
+            grid-template-columns: 1fr;
+          }
+          .field-wrapper {
+            grid-template-columns: 40% 60%;
+          }
+        }
+    </style>
+</head>
+<body>
+<h1 class="page-title"><i class="fas fa-plus-circle"></i>Ingresar Calificaciones Tributarias</h1>
+
+<div class="container">
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="error">
+                <i class="fas fa-exclamation-circle mr-2"></i>{{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <!-- DATOS Principales -->
+            <h3><i class="fas fa-file-alt"></i>Datos Principales</h3>
+            <div class="grid-3">
+
+                <div class="field-wrapper">
+                    <label for="{{ form.ejercicio.id_for_label }}" class="label">
+                        {{ form.ejercicio.label }}
+                    </label>
+                    {{ form.ejercicio }}
+                    {% if form.ejercicio.errors %}
+                    <div class="error">{{ form.ejercicio.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.mercado.id_for_label }}" class="label">
+                        {{ form.mercado.label }}
+                    </label>
+                    {{ form.mercado }}
+                    {% if form.mercado.errors %}
+                    <div class="error">{{ form.mercado.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.instrumento.id_for_label }}" class="label">
+                        {{ form.instrumento.label }}
+                    </label>
+                    {{ form.instrumento }}
+                    {% if form.instrumento.errors %}
+                    <div class="error">{{ form.instrumento.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.fecha.id_for_label }}" class="label">
+                        {{ form.fecha.label }}
+                    </label>
+                    {{ form.fecha }}
+                    {% if form.fecha.errors %}
+                    <div class="error">{{ form.fecha.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.secuencia.id_for_label }}" class="label">
+                        {{ form.secuencia.label }}
+                    </label>
+                    {{ form.secuencia }}
+                    {% if form.secuencia.errors %}
+                    <div class="error">{{ form.secuencia.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.numero_dividendo.id_for_label }}" class="label">
+                        {{ form.numero_dividendo.label }}
+                    </label>
+                    {{ form.numero_dividendo }}
+                    {% if form.numero_dividendo.errors %}
+                    <div class="error">{{ form.numero_dividendo.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.tipo_sociedad.id_for_label }}" class="label">
+                        {{ form.tipo_sociedad.label }}
+                    </label>
+                    {{ form.tipo_sociedad }}
+                    {% if form.tipo_sociedad.errors %}
+                    <div class="error">{{ form.tipo_sociedad.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.valor_historico.id_for_label }}" class="label">
+                        {{ form.valor_historico.label }}
+                    </label>
+                    {{ form.valor_historico }}
+                    {% if form.valor_historico.errors %}
+                    <div class="error">{{ form.valor_historico.errors }}</div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <!-- FACTORES -->
+            <h3><i class="fas fa-calculator"></i>Factores (8 al 37)</h3>
+            <div class="grid-3">
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_8.id_for_label }}" class="label">
+                        {{ form.factor_8.label }}
+                    </label>
+                    {{ form.factor_8 }}
+                    {% if form.factor_8.errors %}
+                    <div class="error">{{ form.factor_8.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_9.id_for_label }}" class="label">
+                        {{ form.factor_9.label }}
+                    </label>
+                    {{ form.factor_9 }}
+                    {% if form.factor_9.errors %}
+                    <div class="error">{{ form.factor_9.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_10.id_for_label }}" class="label">
+                        {{ form.factor_10.label }}
+                    </label>
+                    {{ form.factor_10 }}
+                    {% if form.factor_10.errors %}
+                    <div class="error">{{ form.factor_10.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_11.id_for_label }}" class="label">
+                        {{ form.factor_11.label }}
+                    </label>
+                    {{ form.factor_11 }}
+                    {% if form.factor_11.errors %}
+                    <div class="error">{{ form.factor_11.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_12.id_for_label }}" class="label">
+                        {{ form.factor_12.label }}
+                    </label>
+                    {{ form.factor_12 }}
+                    {% if form.factor_12.errors %}
+                    <div class="error">{{ form.factor_12.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_13.id_for_label }}" class="label">
+                        {{ form.factor_13.label }}
+                    </label>
+                    {{ form.factor_13 }}
+                    {% if form.factor_13.errors %}
+                    <div class="error">{{ form.factor_13.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_14.id_for_label }}" class="label">
+                        {{ form.factor_14.label }}
+                    </label>
+                    {{ form.factor_14 }}
+                    {% if form.factor_14.errors %}
+                    <div class="error">{{ form.factor_14.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_15.id_for_label }}" class="label">
+                        {{ form.factor_15.label }}
+                    </label>
+                    {{ form.factor_15 }}
+                    {% if form.factor_15.errors %}
+                    <div class="error">{{ form.factor_15.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_16.id_for_label }}" class="label">
+                        {{ form.factor_16.label }}
+                    </label>
+                    {{ form.factor_16 }}
+                    {% if form.factor_16.errors %}
+                    <div class="error">{{ form.factor_16.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_17.id_for_label }}" class="label">
+                        {{ form.factor_17.label }}
+                    </label>
+                    {{ form.factor_17 }}
+                    {% if form.factor_17.errors %}
+                    <div class="error">{{ form.factor_17.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_18.id_for_label }}" class="label">
+                        {{ form.factor_18.label }}
+                    </label>
+                    {{ form.factor_18 }}
+                    {% if form.factor_18.errors %}
+                    <div class="error">{{ form.factor_18.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_19.id_for_label }}" class="label">
+                        {{ form.factor_19.label }}
+                    </label>
+                    {{ form.factor_19 }}
+                    {% if form.factor_19.errors %}
+                    <div class="error">{{ form.factor_19.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_20.id_for_label }}" class="label">
+                        {{ form.factor_20.label }}
+                    </label>
+                    {{ form.factor_20 }}
+                    {% if form.factor_20.errors %}
+                    <div class="error">{{ form.factor_20.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_21.id_for_label }}" class="label">
+                        {{ form.factor_21.label }}
+                    </label>
+                    {{ form.factor_21 }}
+                    {% if form.factor_21.errors %}
+                    <div class="error">{{ form.factor_21.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_22.id_for_label }}" class="label">
+                        {{ form.factor_22.label }}
+                    </label>
+                    {{ form.factor_22 }}
+                    {% if form.factor_22.errors %}
+                    <div class="error">{{ form.factor_22.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_23.id_for_label }}" class="label">
+                        {{ form.factor_23.label }}
+                    </label>
+                    {{ form.factor_23 }}
+                    {% if form.factor_23.errors %}
+                    <div class="error">{{ form.factor_23.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_24.id_for_label }}" class="label">
+                        {{ form.factor_24.label }}
+                    </label>
+                    {{ form.factor_24 }}
+                    {% if form.factor_24.errors %}
+                    <div class="error">{{ form.factor_24.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_25.id_for_label }}" class="label">
+                        {{ form.factor_25.label }}
+                    </label>
+                    {{ form.factor_25 }}
+                    {% if form.factor_25.errors %}
+                    <div class="error">{{ form.factor_25.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_26.id_for_label }}" class="label">
+                        {{ form.factor_26.label }}
+                    </label>
+                    {{ form.factor_26 }}
+                    {% if form.factor_26.errors %}
+                    <div class="error">{{ form.factor_26.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_27.id_for_label }}" class="label">
+                        {{ form.factor_27.label }}
+                    </label>
+                    {{ form.factor_27 }}
+                    {% if form.factor_27.errors %}
+                    <div class="error">{{ form.factor_27.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_28.id_for_label }}" class="label">
+                        {{ form.factor_28.label }}
+                    </label>
+                    {{ form.factor_28 }}
+                    {% if form.factor_28.errors %}
+                    <div class="error">{{ form.factor_28.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_29.id_for_label }}" class="label">
+                        {{ form.factor_29.label }}
+                    </label>
+                    {{ form.factor_29 }}
+                    {% if form.factor_29.errors %}
+                    <div class="error">{{ form.factor_29.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_30.id_for_label }}" class="label">
+                        {{ form.factor_30.label }}
+                    </label>
+                    {{ form.factor_30 }}
+                    {% if form.factor_30.errors %}
+                    <div class="error">{{ form.factor_30.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_31.id_for_label }}" class="label">
+                        {{ form.factor_31.label }}
+                    </label>
+                    {{ form.factor_31 }}
+                    {% if form.factor_31.errors %}
+                    <div class="error">{{ form.factor_31.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_32.id_for_label }}" class="label">
+                        {{ form.factor_32.label }}
+                    </label>
+                    {{ form.factor_32 }}
+                    {% if form.factor_32.errors %}
+                    <div class="error">{{ form.factor_32.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_33.id_for_label }}" class="label">
+                        {{ form.factor_33.label }}
+                    </label>
+                    {{ form.factor_33 }}
+                    {% if form.factor_33.errors %}
+                    <div class="error">{{ form.factor_33.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_34.id_for_label }}" class="label">
+                        {{ form.factor_34.label }}
+                    </label>
+                    {{ form.factor_34 }}
+                    {% if form.factor_34.errors %}
+                    <div class="error">{{ form.factor_34.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_35.id_for_label }}" class="label">
+                        {{ form.factor_35.label }}
+                    </label>
+                    {{ form.factor_35 }}
+                    {% if form.factor_35.errors %}
+                    <div class="error">{{ form.factor_35.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_36.id_for_label }}" class="label">
+                        {{ form.factor_36.label }}
+                    </label>
+                    {{ form.factor_36 }}
+                    {% if form.factor_36.errors %}
+                    <div class="error">{{ form.factor_36.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-wrapper">
+                    <label for="{{ form.factor_37.id_for_label }}" class="label">
+                        {{ form.factor_37.label }}
+                    </label>
+                    {{ form.factor_37 }}
+                    {% if form.factor_37.errors %}
+                    <div class="error">{{ form.factor_37.errors }}</div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>AGREGAR
+                </button>
+                <a href="{% url 'dashboard:dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>CANCELAR
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
